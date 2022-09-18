@@ -38,13 +38,13 @@ class RequestData(Jsonable):
     def __post_init__(self):
         assert self.image.ndim == 3
         assert self.image.dtype == np.uint8
-        assert self.mask.ndim == 3
+        assert self.mask.ndim == 2
         assert self.mask.dtype == np.uint8
-        assert self.image.shape == self.mask.shape
+        assert self.image.shape[:2] == self.mask.shape
 
         mask_element_set = set(self.mask.flatten().tolist())
-        is_binary_arr = mask_element_set == {0, 1}
-        assert is_binary_arr, print(mask_element_set)
+        is_binary_arr = mask_element_set == {0, 255}
+        assert is_binary_arr, mask_element_set
 
         if self.metadata is None:
             self.metadata = {}
