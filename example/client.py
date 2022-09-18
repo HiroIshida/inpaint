@@ -1,5 +1,6 @@
 import argparse
 import time
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,8 +22,11 @@ if __name__ == "__main__":
 
     client = InpaintClient(host=host, port=port)
 
-    image = np.array(Image.open("./example.png"))
-    mask = np.array(Image.open("./example_mask.png"))
+    base_path = Path(__file__).parent.absolute()
+    image_path = base_path / "example.png"
+    mask_path = base_path / "example_mask.png"
+    image = np.array(Image.open(image_path))
+    mask = np.array(Image.open(mask_path))
     req = RequestData(image, mask, use_gpu=use_gpu)
 
     ts = time.time()
