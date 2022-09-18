@@ -21,4 +21,5 @@ if __name__ == "__main__":
     axes[1].set_title("mask")
     axes[2].imshow(resp.image)
     axes[2].set_title("inpainted image")
+
     plt.show()
