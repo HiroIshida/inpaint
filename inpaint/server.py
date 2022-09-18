@@ -12,7 +12,7 @@ from PIL import Image
 from inpaint.common import RequestData, ResponseData
 
 
-class InpaintServerBase(BaseHTTPRequestHandler):
+class InpaintPostHandler(BaseHTTPRequestHandler):
     def _set_response(self):
         self.send_response(200)
         self.send_header("Content-type", "application/json")
@@ -31,7 +31,7 @@ class InpaintServerBase(BaseHTTPRequestHandler):
         pass
 
 
-class TorchCallInpaintServer(InpaintServerBase):
+class TorchCallHandler(InpaintPostHandler):
     def handle_request(self, req: RequestData) -> ResponseData:
         with tempfile.TemporaryDirectory() as td:
             p = Path(td)
@@ -58,7 +58,7 @@ class TorchCallInpaintServer(InpaintServerBase):
         return resp
 
 
-def run_server(handler_class: Type[InpaintServerBase], server_class=HTTPServer, port=8080):
+def run_server(handler_class: Type[InpaintPostHandler], server_class=HTTPServer, port=8080):
     logging.basicConfig(level=logging.INFO)
     server_address = ("", port)
     httpd = server_class(server_address, handler_class)
@@ -72,4 +72,4 @@ def run_server(handler_class: Type[InpaintServerBase], server_class=HTTPServer, 
 
 
 if __name__ == "__main__":
-    run_server(TorchCallInpaintServer)
+    run_server(TorchCallHandler)

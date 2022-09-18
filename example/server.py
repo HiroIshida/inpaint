@@ -1,10 +1,11 @@
 import argparse
+from typing import Type
 
 from inpaint.common import RequestData, ResponseData
-from inpaint.server import InpaintServerBase, TorchCallInpaintServer, run_server
+from inpaint.server import InpaintPostHandler, TorchCallHandler, run_server
 
 
-class InpaintServerMock(InpaintServerBase):
+class HandlerMock(InpaintPostHandler):
     def handle_request(self, req: RequestData) -> ResponseData:
         resp = ResponseData(req.image, {})
         return resp
@@ -16,8 +17,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     is_testing = args.test
 
+    handler: Type[InpaintPostHandler]
     if is_testing:
-        handler = InpaintServerMock
+        handler = HandlerMock
     else:
-        handler = TorchCallInpaintServer
+        handler = TorchCallHandler
     run_server(handler)
