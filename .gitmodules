@@ -1,0 +1,3 @@
+[submodule "inpaint/siggraph2017_inpainting"]
+	path = inpaint/siggraph2017_inpainting
+	url = https://github.com/HiroIshida/siggraph2017_inpainting.git

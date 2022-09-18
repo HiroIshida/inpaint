@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup_requires = []
 
-install_requires = []
+install_requires = ["dataclasses", "numpy", "Pillow"]
 
 setup(
     name="inpaint",

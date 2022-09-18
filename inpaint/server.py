@@ -1,7 +1,13 @@
 import logging
+import subprocess
+import tempfile
 from abc import abstractmethod
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
 from typing import Type
+
+import numpy as np
+from PIL import Image
 
 from inpaint.common import RequestData, ResponseData
 
@@ -27,8 +33,28 @@ class InpaintServerBase(BaseHTTPRequestHandler):
 
 class TorchCallInpaintServer(InpaintServerBase):
     def handle_request(self, req: RequestData) -> ResponseData:
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td)
+            image_path = (p / "image.png").expanduser()
+            im = Image.fromarray(req.image)
+            im.save(image_path)
 
-        resp = ResponseData(req.image, {})
+            mask_path = (p / "mask.png").expanduser()
+            mask = Image.fromarray(req.mask)
+            mask.save(mask_path)
+
+            here_path = Path(__file__).parent
+            script_dir_path = (here_path / "siggraph2017_inpainting").absolute()
+            script_path = script_dir_path / "inpaint.lua"
+            cmd = "cd {siggraph} && th {script} --input {image} --mask {mask}".format(
+                siggraph=script_dir_path, script=script_path, image=image_path, mask=mask_path
+            )
+            subprocess.run(cmd, shell=True)
+            output_path = script_dir_path / "out.png"
+            image_out = np.array(Image.open(output_path))
+            output_path.unlink()
+
+        resp = ResponseData(image_out)
         return resp
 
 
@@ -43,3 +69,7 @@ def run_server(handler_class: Type[InpaintServerBase], server_class=HTTPServer, 
         pass
     httpd.server_close()
     logging.info("Stopping httpd...\n")
+
+
+if __name__ == "__main__":
+    run_server(TorchCallInpaintServer)
