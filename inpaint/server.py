@@ -46,8 +46,13 @@ class TorchCallHandler(InpaintPostHandler):
             here_path = Path(__file__).parent
             script_dir_path = (here_path / "siggraph2017_inpainting").absolute()
             script_path = script_dir_path / "inpaint.lua"
-            cmd = "cd {siggraph} && th {script} --input {image} --mask {mask}".format(
-                siggraph=script_dir_path, script=script_path, image=image_path, mask=mask_path
+            gpu_flag = "--gpu" if req.use_gpu else ""
+            cmd = "cd {siggraph} && th {script} --input {image} --mask {mask} {gpu}".format(
+                siggraph=script_dir_path,
+                script=script_path,
+                image=image_path,
+                mask=mask_path,
+                gpu=gpu_flag,
             )
             subprocess.run(cmd, shell=True)
 

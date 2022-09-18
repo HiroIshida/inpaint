@@ -33,6 +33,7 @@ class Jsonable:
 class RequestData(Jsonable):
     image: np.ndarray
     mask: np.ndarray
+    use_gpu: bool = False
     metadata: Optional[Dict] = None
 
     def __post_init__(self):
