@@ -23,8 +23,7 @@ if __name__ == "__main__":
 
     image = np.array(Image.open("./example.png"))
     mask = np.array(Image.open("./example_mask.png"))
-    req = RequestData(image, mask, {})
-    req.use_gpu = use_gpu
+    req = RequestData(image, mask, use_gpu=use_gpu)
 
     ts = time.time()
     resp = client(req)

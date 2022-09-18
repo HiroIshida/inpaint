@@ -7,7 +7,7 @@ from inpaint.server import InpaintPostHandler, TorchCallHandler, run_server
 
 class HandlerMock(InpaintPostHandler):
     def handle_request(self, req: RequestData) -> ResponseData:
-        resp = ResponseData(req.image, req,image)
+        resp = ResponseData(req.image, req.image)
         return resp
 
 
