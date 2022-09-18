@@ -11,11 +11,15 @@ from inpaint.common import RequestData
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--gpu", action="store_true", help="use gpu")
+    parser.add_argument("-port", type=int, default=8080, help="port")
+    parser.add_argument("-host", type=str, default="localhost", help="hostname")
 
     args = parser.parse_args()
     use_gpu: bool = args.gpu
+    port: int = args.port
+    host: str = args.host
 
-    client = InpaintClient()
+    client = InpaintClient(host=host, port=port)
 
     image = np.array(Image.open("./example.png"))
     mask = np.array(Image.open("./example_mask.png"))

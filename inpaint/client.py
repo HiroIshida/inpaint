@@ -7,13 +7,13 @@ from inpaint.common import RequestData, ResponseData
 
 @dataclass
 class InpaintClient:
-    host_name: str = "localhost"
+    host: str = "localhost"
     port: int = 8080
     conn: Optional[HTTPConnection] = None
 
     def __post_init__(self):
         if self.conn is None:
-            self.conn = HTTPConnection(self.host_name, self.port)
+            self.conn = HTTPConnection(self.host, self.port)
 
     def __call__(self, req: RequestData) -> ResponseData:
         assert self.conn is not None
