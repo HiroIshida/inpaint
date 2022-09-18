@@ -2,6 +2,7 @@ import logging
 import subprocess
 import tempfile
 from abc import abstractmethod
+from enum import Enum
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Type
@@ -31,6 +32,12 @@ class InpaintPostHandler(BaseHTTPRequestHandler):
         pass
 
 
+class Model(Enum):
+    freeform = "completionnet_places2_freeform.t7"
+    rectangle = "completionnet_places2.t7"
+    face = "completionnet_celeba.t7"
+
+
 class TorchCallHandler(InpaintPostHandler):
     def handle_request(self, req: RequestData) -> ResponseData:
         with tempfile.TemporaryDirectory() as td:
@@ -47,11 +54,18 @@ class TorchCallHandler(InpaintPostHandler):
             script_dir_path = (here_path / "siggraph2017_inpainting").absolute()
             script_path = script_dir_path / "inpaint.lua"
             gpu_flag = "--gpu" if req.use_gpu else ""
-            cmd = "cd {siggraph} && th {script} --input {image} --mask {mask} {gpu}".format(
+
+            if req.metadata is not None and "model" in req.metadata:
+                model = Model[req.metadata["model"]]
+            else:
+                model = Model.freeform
+
+            cmd = "cd {siggraph} && th {script} --input {image} --mask {mask} --model {model} {gpu}".format(
                 siggraph=script_dir_path,
                 script=script_path,
                 image=image_path,
                 mask=mask_path,
+                model=model.value,
                 gpu=gpu_flag,
             )
             subprocess.run(cmd, shell=True)

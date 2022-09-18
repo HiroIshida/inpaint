@@ -33,12 +33,16 @@ class InteractiveTuner:
         self.client = client
         self.img_original = img_original
 
-    def draw(self, use_gpu: bool) -> None:
+    def draw(self, use_gpu: bool, pretrained_model: Optional[str] = None) -> None:
         img_masked = self.apply(self.img_original)
         cv2.imshow("window", img_masked[..., ::-1])  # type: ignore
 
         mask = self.get_mask_image()
-        req = RequestData(self.img_original, mask, use_gpu=use_gpu)
+
+        metadata = {}
+        if pretrained_model is not None:
+            metadata["model"] = pretrained_model
+        req = RequestData(self.img_original, mask, use_gpu=use_gpu, metadata=metadata)
         resp = self.client(req)
         cv2.imshow("window-inpainted", resp.image[..., ::-1])  # type: ignore
 
@@ -70,12 +74,14 @@ if __name__ == "__main__":
     parser.add_argument("-port", type=int, default=8080, help="port")
     parser.add_argument("-host", type=str, default="localhost", help="hostname")
     parser.add_argument("-image", type=str, help="image path")
+    parser.add_argument("-model", type=str, help="pretrained model")
 
     args = parser.parse_args()
     use_gpu: bool = args.gpu
     port: int = args.port
     host: str = args.host
     image_path_str: Optional[str] = args.image
+    pretrained_model: Optional[str] = args.model
 
     client = InpaintClient(host=host, port=port)
 
@@ -90,4 +96,4 @@ if __name__ == "__main__":
     while True:
         cv2.waitKey(10)
         tuner.reflect_trackbar()
-        tuner.draw(use_gpu=use_gpu)
+        tuner.draw(use_gpu=use_gpu, pretrained_model=pretrained_model)
