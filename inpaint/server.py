@@ -50,11 +50,16 @@ class TorchCallHandler(InpaintPostHandler):
                 siggraph=script_dir_path, script=script_path, image=image_path, mask=mask_path
             )
             subprocess.run(cmd, shell=True)
+
             output_path = script_dir_path / "out.png"
-            image_out = np.array(Image.open(output_path))
+            output = np.array(Image.open(output_path))
             output_path.unlink()
 
-        resp = ResponseData(image_out)
+            debug_image_path = script_dir_path / "input.png"
+            debug_image = np.array(Image.open(debug_image_path))
+            debug_image_path.unlink()
+
+        resp = ResponseData(output, debug_image)
         return resp
 
 

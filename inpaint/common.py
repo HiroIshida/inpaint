@@ -53,6 +53,7 @@ class RequestData(Jsonable):
 @dataclass
 class ResponseData(Jsonable):
     image: np.ndarray
+    debug_image: np.ndarray
     metadata: Optional[Dict] = None
 
     def __post_init__(self):
